@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meditech – AI-Powered Healthcare Supply Chain</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Apple system font stack */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      background-color: #f5f5f7; /* Light gray background */
+      color: #1c1c1e; /* Dark gray text */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      scroll-behavior: smooth;
+    }
+    /* Animate fade-in on scroll */
+    [data-animate] {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    [data-animate].visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Counters style */
+    .counter {
+      font-weight: 600;
+      font-size: 2rem;
+      color: #0071e3; /* Apple blue accent */
+      font-feature-settings: "tnum"; /* Tabular numbers for counters */
+      font-variant-numeric: tabular-nums;
+    }
+    /* Nav styling */
+    nav#mainNav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 50;
+      background: transparent;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    nav#mainNav.scrolled {
+      background-color: white;
+      box-shadow: 0 1px 12px rgb(0 0 0 / 0.1);
+    }
+    nav#mainNav a {
+      color: #0071e3;
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+      position: relative;
+    }
+    nav#mainNav a:hover,
+    nav#mainNav a:focus-visible {
+      outline: none;
+    }
+    /* Underline animation */
+    nav#mainNav a.nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #0071e3;
+      transition: width 0.3s ease;
+      border-radius: 1px;
+    }
+    nav#mainNav a.nav-link:hover::after,
+    nav#mainNav a.nav-link:focus-visible::after {
+      width: 100%;
+    }
+    nav#mainNav .nav-links {
+      display: flex;
+      gap: 3rem;
+    }
+    nav#mainNav .brand {
+      font-size: 1.25rem;
+    }
+    /* Hamburger */
+    #menuToggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0071e3;
+    }
+    #menuToggle:focus-visible {
+      outline: 2px solid #0a84ff;
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    /* Mobile Menu */
+    #mobileMenu {
+      background: white;
+      border-top: 1px solid #d2d2d7;
+      box-shadow: 0 4px 20px rgb(0 0 0 / 0.1);
+      position: fixed;
+      top: 64px; /* nav height */
+      left: 0;
+      right: 0;
+      z-index: 45;
+      display: none;
+      flex-direction: column;
+      padding: 1rem 2rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #0071e3;
+      gap: 1rem;
+    }
+    #mobileMenu.show {
+      display: flex;
+    }
+    /* Hero Section with Slideshow */
+    #home {
+      position: relative;
+      height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+      font-weight: 600;
+      padding: 0 1.5rem;
+      margin-top: 64px; /* to offset fixed nav */
+    }
+    #home .hero-slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1s ease;
+      border-radius: 1rem;
+      user-select: none;
+    }
+    #home .hero-slide.active {
+      opacity: 1;
+      z-index: 0;
+    }
+    #home .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      border-radius: 1rem;
+      z-index: 1;
+      user-select: none;
+    }
+    #home .content {
+      position: relative;
+      max-width: 28rem;
+      z-index: 2;
+      border-radius: 1rem;
+      padding: 3rem 2rem;
+      background: rgba(255 255 255 / 0.15);
+      backdrop-filter: saturate(180%) blur(20px);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+      user-select: none;
+    }
+    #home h1 {
+      font-size: 3rem;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+    #home p {
+      font-size: 1.125rem;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+    }
+    /* Sections */
+    section {
+      max-width: 56rem;
+      margin: 3rem auto;
+      padding: 0 1rem;
+    }
+    section h2 {
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #1d1d1f;
+      border-bottom: 2px solid #0071e3;
+      padding-bottom: 0.5rem;
+    }
+    section p, section ul {
+      font-weight: 400;
+      font-size: 1rem;
+      color: #3c3c4399;
+      line-height: 1.6;
+    }
+    ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+    /* Tables */
+    table {
+      border-collapse: separate;
+      border-spacing: 0 0.75rem;
+      width: 100%;
+      font-weight: 500;
+    }
+    thead tr th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      color: #1d1d1f;
+      font-weight: 600;
+      border-bottom: 1.5px solid #c6c6c8;
+    }
+    tbody tr {
+      background: #fff;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 4px rgb(0 0 0 / 0.1);
+      transition: background-color 0.25s ease;
+      cursor: default;
+    }
+    tbody tr:hover {
+      background-color: #f0f5ff;
+    }
+    tbody tr td {
+      padding: 0.75rem 1rem;
+      vertical-align: middle;
+      border: none;
+      color: #3c3c4399;
+      font-weight: 500;
+    }
+    tbody tr td.text-right {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    /* Buttons */
+    button {
+      background: linear-gradient(90deg, #0071e3 0%, #0a84ff 100%);
+      color: white;
+      font-weight: 600;
+      padding: 0.6rem 1.4rem;
+      border-radius: 1rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 15px rgba(0, 113, 227, 0.3);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      font-size: 1rem;
+      user-select: none;
+      outline-offset: 2px;
+    }
+    button:hover,
+    button:focus {
+      background: linear-gradient(90deg, #005bb5 0%, #0a54cc 100%);
+      box-shadow: 0 10px 20px rgba(0, 86, 181, 0.5);
+      outline: none;
+    }
+    button:focus-visible {
+      outline: 2px solid #0a84ff;
+      outline-offset: 3px;
+    }
+    /* Footer */
+    footer {
+      margin-top: 4rem;
+      padding: 2rem 1rem;
+      color: #3c3c4399;
+      text-align: center;
+      font-weight: 400;
+      font-size: 0.9rem;
+      background: #fafafa;
+      border-top: 1px solid #d2d2d7;
+    }
+    footer a {
+      color: #0071e3;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+    /* Responsive tweaks */
+    @media (min-width: 768px) {
+      #home h1 {
+        font-size: 4rem;
+      }
+      #home p {
+        font-size: 1.25rem;
+      }
+      section {
+        padding: 0;
+      }
+      nav#mainNav .nav-links {
+        gap: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="mainNav" aria-label="Primary navigation">
+    <div class="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
+      <a href="#home" class="brand nav-link" tabindex="0">Meditech</a>
+      <div class="nav-links hidden md:flex">
+        <a href="#about" class="nav-link" tabindex="0">About</a>
+        <a href="#offerings" class="nav-link" tabindex="0">Offerings</a>
+        <a href="#mt-kit-quote" class="nav-link" tabindex="0">MT-Kit Quote</a>
+        <a href="#value" class="nav-link" tabindex="0">Value</a>
+        <a href="#contact" class="nav-link" tabindex="0">Contact</a>
+      </div>
+
+      <!-- Hamburger menu for small screens -->
+      <button id="menuToggle" aria-label="Toggle menu" aria-expanded="false" class="md:hidden">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" >
+          <line x1="3" y1="7" x2="21" y2="7" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="17" x2="21" y2="17" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" role="menu" class="" >
+      <a href="#about" role="menuitem" tabindex="-1" class="nav-link">About</a>
+      <a href="#offerings" role="menuitem" tabindex="-1" class="nav-link">Offerings</a>
+      <a href="#mt-kit-quote" role="menuitem" tabindex="-1" class="nav-link">MT-Kit Quote</a>
+      <a href="#value" role="menuitem" tabindex="-1" class="nav-link">Value</a>
+      <a href="#contact" role="menuitem" tabindex="-1" class="nav-link">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section with Apple-style Slideshow -->
+  <section id="home" aria-label="Hero section with slideshow">
+    <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1588776814546-77b7da0a4b71?fit=crop&w=1600&q=80');"></div>
+    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1505751172876-fa1923c5c528?fit=crop&w=1600&q=80');"></div>
+    <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1531746790731-6c087fecd65a?fit=crop&w=1600&q=80');"></div>
+    <div class="overlay"></div>
+    <div class="content" data-animate>
+      <h1>Meditech</h1>
+      <p>Turning healthcare supply data into smarter, faster, cost-saving decisions.</p>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" data-animate>
+    <h2>What We Do</h2>
+    <p>Meditech is an AI-driven platform that streamlines the healthcare supply chain for hospitals, suppliers, and GPOs. By combining real-time data, a global product database, and predictive analytics, we help reduce costs, optimize inventory, and improve patient outcomes.</p>
+  </section>
+
+  <!-- Offerings -->
+  <section id="offerings" data-animate>
+    <h2>Core Offerings</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div>
+        <h3>For Providers</h3>
+        <ul>
+          <li>MT-Global Product Database – Perpetually updated catalog.</li>
+          <li>MT-Spend Analysis – AI-driven cost & supplier optimization.</li>
+          <li>MT-CQOR – Integrates cost, quality, outcomes, reimbursements.</li>
+          <li>MT-Procedure Card Management – OR supply optimization.</li>
+          <li>MT-Robotic Surgery Analysis – Tracks & optimizes robotics use.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>For Suppliers & GPOs</h3>
+        <ul>
+          <li>MT-Kit Quote – Automates surgical kit creation & pricing.</li>
+          <li>MT-Contract Management – Digital supplier agreements.</li>
+          <li>MT-ORB – GPO-in-a-box for rapid setup.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- MT-Kit Quote Widget -->
+  <section id="mt-kit-quote" data-animate>
+    <h2>MT-Kit Quote – Automates surgical kit creation & pricing</h2>
+    <table role="table" aria-label="MT-Kit Quote details">
+      <thead>
+        <tr>
+          <th scope="col">Kit Name</th>
+          <th scope="col" class="text-right">Item Count</th>
+          <th scope="col" class="text-right">Price (USD)</th>
+        </tr>
+      </thead>
+      <tbody id="kit-table-body"></tbody>
+    </table>
+    <button id="downloadExcelBtn" aria-label="Download MT-Kit Quote data as Excel file">Download Excel</button>
+  </section>
+
+  <!-- Value & Case Study -->
+  <section id="value" data-animate>
+    <h2>Key Value & Impact</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+      <div>
+        <div class="counter" data-target="15">0</div>
+        <p>Procurement Cost Reduction (%)</p>
+      </div>
+      <div>
+        <div class="counter" data-target="50">0</div>
+        <p>Sourcing & Analysis Time Saved (%)</p>
+      </div>
+      <div>
+        <div class="counter" data-target="70">0</div>
+        <p>OR Inventory Waste Reduced (%)</p>
+      </div>
+      <div>
+        <div class="counter" data-target="10">0</div>
+        <p>Improved Clinical Outcomes (%)</p>
+      </div>
+    </div>
+    <div style="margin-top: 3rem; background: #fff; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 10px rgb(0 0 0 / 0.1); max-width: 36rem; margin-left:auto; margin-right:auto;">
+      <h3 style="font-weight: 600; margin-bottom: 0.75rem; text-align:center;">Case Example</h3>
+      <p style="text-align:center; font-size: 0.875rem; color: #6e6e73;">A 500-bed hospital cut $5M in annual supply costs in 12 months using MT-Spend Analysis & Procedure Card Management modules.</p>
+    </div>
+  </section>
+
+  <!-- Competitive Advantage -->
+  <section data-animate>
+    <h2>Why Meditech?</h2>
+    <ul>
+      <li>Hybrid Control Tower – AI + human expertise.</li>
+      <li>"Ask my Nurse" conversational AI agent.</li>
+      <li>ERP/EHR integration (Epic, Cerner, SAP, Oracle).</li>
+      <li>HIPAA-compliant, HITRUST-certified infrastructure.</li>
+    </ul>
+  </section>
+
+  <!-- Market & Future -->
+  <section data-animate>
+    <h2>Market & Future</h2>
+    <p>Global healthcare supply chain market: $80B+, growing at 8% CAGR. Increasing demand for value-based, data-driven procurement solutions.</p>
+    <p><strong>Roadmap:</strong> Predictive shortage alerts, generative AI RFPs/contracts, global expansion.</p>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" data-animate>
+    <h2>Contact Us</h2>
+    <p>Email: <a href="mailto:sales@meditech.com">sales@meditech.com</a></p>
+    <p>Phone: +1 (555) 123-4567</p>
+  </section>
+
+  <footer>
+    &copy; 2025 Meditech. All rights reserved. Visit our <a href="https://www.meditech.com" target="_blank" rel="noopener noreferrer">website</a>.
+  </footer>
+
+  <script>
+    // Hero slideshow logic
+    const slides = document.querySelectorAll('.hero-slide');
+    let currentSlide = 0;
+    function showSlide(i) {
+      slides.forEach((slide, idx) => {
+        slide.classList.toggle('active', idx === i);
+      });
+    }
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }, 6000);
+
+    // Scroll-based nav background change
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 40) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    });
+
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuToggle.addEventListener('click', () => {
+      const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+      menuToggle.setAttribute('aria-expanded', !expanded);
+      mobileMenu.classList.toggle('show');
+    });
+
+    // Smooth scroll and close mobile menu on link click
+    document.querySelectorAll('nav a').forEach(anchor => {
+      anchor.addEventListener('click', (e) => {
+        if(anchor.hash) {
+          e.preventDefault();
+          const target = document.querySelector(anchor.hash);
+          if(target) target.scrollIntoView({ behavior: 'smooth' });
+          if(mobileMenu.classList.contains('show')) {
+            mobileMenu.classList.remove('show');
+            menuToggle.setAttribute('aria-expanded', false);
+          }
+        }
+      });
+    });
+
+    // Animate sections on scroll
+    const animateElements = document.querySelectorAll('[data-animate]');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add('visible');
+        }
+      });
+    }, {threshold: 0.2});
+    animateElements.forEach(el => observer.observe(el));
+
+    // Counter animation
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach(counter => {
+      const updateCount = () => {
+        const target = +counter.getAttribute('data-target');
+        let count = +counter.innerText;
+        const increment = target / 120;
+        if(count < target) {
+          counter.innerText = Math.ceil(count + increment);
+          setTimeout(updateCount, 15);
+        } else {
+          counter.innerText = target;
+        }
+      };
+      updateCount();
+    });
+
+    // MT-Kit Quote Data & Download
+    const kits = [
+      { name: "Basic Surgical Kit", count: 12, price: 1200 },
+      { name: "Advanced Cardiac Kit", count: 20, price: 3500 },
+      { name: "Neuro Surgery Kit", count: 18, price: 2800 },
+      { name: "Orthopedic Kit", count: 25, price: 4100 },
+      { name: "General Surgery Kit", count: 15, price: 2100 }
+    ];
+
+    const kitTableBody = document.getElementById('kit-table-body');
+    kits.forEach(kit => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${kit.name}</td>
+        <td class="text-right">${kit.count}</td>
+        <td class="text-right">$${kit.price.toLocaleString()}</td>
+      `;
+      kitTableBody.appendChild(tr);
+    });
+
+    // Excel download functionality (CSV export)
+    document.getElementById('downloadExcelBtn').addEventListener('click', () => {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Kit Name,Item Count,Price (USD)\n";
+      kits.forEach(k => {
+        csvContent += `${k.name},${k.count},${k.price}\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "mt_kit_quote.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  </script>
+</body>
+</html>
