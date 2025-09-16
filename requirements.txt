@@ -1,0 +1,6 @@
+pandas
+streamlit
+openpyxl
+rapidfuzz
+openai
+plotly
